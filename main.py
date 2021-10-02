@@ -40,12 +40,9 @@ for c in cnts:
     predict_img = model.predict(img_array)
     label = tf.nn.softmax(predict_img[0])
     os.remove('results/hole_{}.jpg'.format(holes_number))
-    image.save(
-        f'results/{class_names[np.argmax(label)]}/hole_{holes_number}.jpg')
+    image.save(f'results/{class_names[np.argmax(label)]}/hole_{holes_number}.jpg')
     results[class_names[np.argmax(label)]] += 1
     holes_number += 1
-print(
-    f'Total: {holes_number} holes. {results["correct"]} are correct and {results["wrong"]} are wrong')
-print(
-    f'Correct percentage: {round(results["correct"] / holes_number * 100, 2)}%')
+print(f'Total: {holes_number} holes. {results["correct"]} are correct and {results["wrong"]} are wrong')
+print(f'Correct percentage: {round(results["correct"] / holes_number * 100, 2)}%')
 print(f'Wrong percentage: {round(results["wrong"] / holes_number * 100, 2)}%')
