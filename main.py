@@ -12,7 +12,7 @@ import os
 
 model = load_model('saved_model.h5')
 class_names = ['correct', 'wrong']
-full_image = cv2.imread(input('Input track membrane image: '))
+full_image = cv2.imread(input('Path to image: '))
 original = full_image.copy()
 gray = cv2.cvtColor(full_image, cv2.COLOR_BGR2GRAY)
 blurred = cv2.GaussianBlur(gray, (3, 3), 0)
