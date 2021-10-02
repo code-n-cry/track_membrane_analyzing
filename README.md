@@ -21,5 +21,5 @@
   <li>PIL</li>
 </ul>
 
-<b>Dataset.zip</b> is an directory with two subdirectories (that are "correct" and "wrong") that contains in to total 11000 photos of different holes
+<b>Dataset.zip</b> is an directory with two subdirectories (that are "correct" and "wrong") that contains in to total 11000 photos of different holes<br>
 <b>Test.zip</b> is an directory that contains some photos that you can use to check programm's working.
