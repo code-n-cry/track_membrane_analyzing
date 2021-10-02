@@ -15,10 +15,10 @@
 
 <b>Used technologies:</b>
 <ul>
-  <li>TensorFlow</li>
-  <li>Keras</li>
-  <li>NumPy</li>
-  <li>PIL</li>
+  <li><b><a href="https://www.tensorflow.org/" target="_blank">TensorFlow</a></b></li>
+  <li><b><a href="https://keras.io/" target="_blank">Keras</a></b></li>
+  <li><b><a href="https://numpy.org/" target="_blank">NumPy</a></b></li>
+  <li><b><a href="https://pillow.readthedocs.io/en/stable/" target="_blank">PIL</a></b></li>
 </ul>
 
 <b>Dataset.zip</b> is an directory with two subdirectories (that are "correct" and "wrong") that contains in to total 11000 photos of different holes<br>
