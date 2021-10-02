@@ -12,3 +12,14 @@
   </ul>
 <b>I have done:</b>
 <ul><li>first, second and third points</li></ul>
+
+<b>Used technologies:</b>
+<ul>
+  <li>TensorFlow</li>
+  <li>Keras</li>
+  <li>NumPy</li>
+  <li>PIL</li>
+</ul>
+
+<b>Dataset.zip</b> is an directory with two subdirectories (that are "correct" and "wrong") that contains in to total 11000 photos of different holes
+<b>Test.zip</b> is an directory that contains some photos that you can use to check programm's working.
