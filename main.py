@@ -28,7 +28,6 @@ if len(cnts) == 2:
 else:
     cnts = cnts[1]
 cnts, _ = contours.sort_contours(cnts, method="left-to-right")
-fnt = ImageFont.truetype("arial.ttf", 1)
 for c in cnts:
     x, y, w, h = cv2.boundingRect(c)
     hole = original[y: y + h + 2, x: x + w + 2]
