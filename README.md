@@ -11,7 +11,8 @@
   <li>Create GUI to this programm that will show percentage of correct and wrong holes and also show every hole diameter</li>
   </ul>
 <b>I have done:</b>
-<ul><li>first, second and third points</li></ul>
+<ul><li>ALL POINTS!🥳</li></ul><br>
+But now <b>that is new point</b> - to do detecting of holes' diameters more accurate 'cause now it's very non-accurate.<br>
 
 <b>Used technologies:</b>
 <ul>
