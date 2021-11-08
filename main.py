@@ -1,58 +1,63 @@
-import numpy as np
-import cv2
-from imutils import contours
-import numpy as np
-from keras.preprocessing.image import load_img
-from tensorflow import keras
-import tensorflow as tf
-from keras.models import load_model
-from PIL import Image, ImageDraw, ImageFont
 import os
+from interface import Ui_MainWindow
+from PyQt5 import QtCore, QtGui, QtWidgets
+import sys
+from cv_detection import Analyzer
 
-model = load_model('saved_model.h5')
-class_names = ['correct', 'not_a_hole', 'wrong']
-full_image = cv2.imread(input('Input track membrane image: '))
-original = full_image.copy()
-mkms_per_pixel = round(
-    40 / len(full_image[0]), 3), round(40 / len(full_image), 3)
-gray = cv2.cvtColor(full_image, cv2.COLOR_BGR2GRAY)
-blurred = cv2.GaussianBlur(gray, (3, 3), 0)
-canny = cv2.Canny(blurred, 120, 255, 1)
-holes_number = 0
-with open('results/correct_sizes.txt', 'w') as sizes_file:
-    sizes_file.write('SIZES:\n')
-cnts = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-results = {'correct': 0, 'wrong': 0, 'not_a_hole': 0}
-if len(cnts) == 2:
-    cnts = cnts[0]
-else:
-    cnts = cnts[1]
-cnts, _ = contours.sort_contours(cnts, method="left-to-right")
-for c in cnts:
-    x, y, w, h = cv2.boundingRect(c)
-    hole = original[y: y + h + 2, x: x + w + 2]
-    cv2.imwrite('results/hole_{}.jpg'.format(holes_number), hole)
-    image = Image.open('results/hole_{}.jpg'.format(holes_number))
-    width, height = image.size
-    image = image.resize((30, 30))
-    image.save('results/hole_{}.jpg'.format(holes_number))
-    predict_img = model.predict(tf.expand_dims(keras.preprocessing.image.img_to_array(
-        load_img('results/hole_{}.jpg'.format(holes_number), target_size=(30, 30))), 0))
-    os.remove('results/hole_{}.jpg'.format(holes_number))
-    results[class_names[np.argmax(tf.nn.softmax(predict_img[0]))]] += 1
-    if class_names[np.argmax(tf.nn.softmax(predict_img[0]))] != 'not_a_hole':
-        holes_number += 1
-        if class_names[np.argmax(tf.nn.softmax(predict_img[0]))] == 'correct':
-            draw = ImageDraw.Draw(image)
-            draw.line((0, 13, 28, 13), fill=(0, 255, 0), width=1)
-            draw.line((13, 0, 13, 28), fill=(0, 255, 0), width=1)
-            with open('results/correct_sizes.txt', 'a') as sizes_file:
-                sizes_file.write(
-                    f'hole_{holes_number}.jpg\tVERTICAL {round(mkms_per_pixel[0] * (height - 2), 2)} mkm\tHORIZONTAL {round(mkms_per_pixel[0] * (width - 2), 2)} mkm\n')
-    image.save(
-        f'results/{class_names[np.argmax(tf.nn.softmax(predict_img[0]))]}/hole_{holes_number}.jpg')
-print(
-    f'Total: {holes_number} holes. {results["correct"]} are correct and {results["wrong"]} are wrong')
-print(
-    f'Correct percentage: {round(results["correct"] / holes_number * 100, 2)}%')
-print(f'Wrong percentage: {round(results["wrong"] / holes_number * 100, 2)}%')
+
+class Interface(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        super(Interface, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.files = []
+        self.setWindowIcon(QtGui.QIcon('logo.png'))
+        self.setWindowTitle('Track membrane analyzing')
+        self.ui.action.setShortcut('Ctrl+O')
+        self.ui.action.triggered.connect(self.open_files)
+        self.ui.analyzeBtn.clicked.connect(self.analyze)
+        self.ui.PlotLabel.setText('Тут будет диаграмма распределения диаметров!')
+        self.setStyleSheet('''QPushButton {
+                                border: 1px solid black;
+                                border-radius: 7px;
+                                background-color: ghostwhite;
+                            }
+                            QLineEdit {
+                                border: 1px solid black;
+                                border-radius: 5px;
+                            }''')
+        self.show()
+
+    def open_files(self):
+        files, _ = QtWidgets.QFileDialog.getOpenFileNames(self, 'Выберите картинку:', './',
+                                                          "Image (*.png *.jpg *.jpeg *.jfif")
+        for i in files:
+            if i not in self.files:
+                self.files.append(i)
+        text = ['<html><b>Вы открыли файлы:</b></html>', *self.files]
+        self.ui.diameterText.setText('<br>'.join(text))
+
+    def analyze(self):
+        for file in os.listdir('results/correct'):
+            os.remove(f'results/correct/{file}')
+        for file in os.listdir('results/wrong'):
+            os.remove(f'results/wrong/{file}')
+        for file in os.listdir('results/not_a_hole'):
+            os.remove(f'results/not_a_hole/{file}')
+        analyzer = Analyzer(self.files)
+        analyzer.detect_holes()
+        holes_number, results = analyzer.sort_holes()
+        text = ['<html><b>РЕЗУЛЬТАТЫ</b></html>']
+        for i in results:
+            text.append(f'Для <b>{i[0]}</b>:')
+            text.extend([f'Правильные: {i[1]["correct"]}', f'Ошибочные: {i[1]["wrong"]}',
+                         f'Не распознаны: {i[1]["not_a_hole"]}'])
+        text.append('Таблица диаметров -- <b>results/diameters.xlsx!</b>')
+        self.ui.diameterText.setText('<br>'.join(text))
+        self.ui.PlotLabel.setPixmap(QtGui.QPixmap('results/plot.png'))
+
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    my_app = Interface()
+    sys.exit(app.exec())

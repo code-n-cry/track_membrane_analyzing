@@ -1,6 +1,9 @@
-Pillow
-numpy
-tensorflow
+Pillow==8.4.0
+numpy==1.21.4
+tensorflow==2.7.0
 matplotlib
 keras
 scipy
+opencv-python
+pyqt5==5.15.6
+xlsxwriter==3.0.2
